@@ -1,0 +1,5 @@
+{
+  "globalDependencies": {
+    "react-intl": "registry:dt/react-intl#2.2.1+20170323145511"
+  }
+}

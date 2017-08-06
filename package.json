@@ -1,5 +1,5 @@
 {
-  "name": "smashing-react-i18n",
+  "name": "react-i18n",
   "version": "1.0.0",
   "description": "",
   "main": "dist/bundle.js",
@@ -24,14 +24,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yury-dymov/smashing-react-i18n.git"
+    "url": "git+https://github.com/happyahluwalia/react-i18n.git"
   },
-  "author": "Yury Dymov",
+  "author": "Harpreet S Ahluwalia",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/yury-dymov/smashing-react-i18n/issues"
+    "url": "https://github.com/happyahluwalia/react-i18n/issues"
   },
-  "homepage": "https://github.com/yury-dymov/smashing-react-i18n#readme",
+  "homepage": "https://github.com/happyahluwalia/react-i18n#readme",
   "devDependencies": {
     "babel-cli": "^6.18.0",
     "babel-core": "^6.18.2",
@@ -48,8 +48,11 @@
     "webpack-dev-server": "^1.16.2"
   },
   "dependencies": {
+    "accept-language": "^3.0.17",
     "bluebird": "^3.4.7",
+    "cookie-parser": "^1.4.3",
     "express": "^4.14.0",
+    "js-cookie": "^2.1.4",
     "react": "^15.4.0",
     "react-dom": "^15.4.0"
   }

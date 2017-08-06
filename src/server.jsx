@@ -4,6 +4,7 @@ import ReactDom from 'react-dom/server';
 import App from './components/App';
 import cookieParser from 'cookie-parser';
 import acceptLanguage from 'accept-language';
+import { IntlProvider } from 'react-intl';
 
 acceptLanguage.languages(['en', 'es']);
 
@@ -37,12 +38,17 @@ app.use(cookieParser());
 */
 function detectLocale(req){
   const cookieLocale = req.cookies.locale;
-  return acceptLangague.get(cookieLocale || req.headers['accept-language']) || 'en';
+  return acceptLanguage.get(cookieLocale || req.headers['accept-language']) || 'en';
 }
 
 app.use((req, res) => {
   const locale = detectLocale(req);
-  const componentHTML = ReactDom.renderToString(<App />);
+  const componentHTML = ReactDom.renderToString(
+      <IntlProvider local={locale}>
+          <App />
+       </IntlProvider>   
+          );
+
   res.cookie('locale', locale, {maxAge: (new Date() * 0.001) + (365 * 24 * 3600) });
   return res.end(renderHTML(componentHTML));
 })

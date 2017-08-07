@@ -1,16 +1,30 @@
 import express from 'express';
 import React from 'react';
 import ReactDom from 'react-dom/server';
-import App from './components/App';
-import cookieParser from 'cookie-parser';
 import acceptLanguage from 'accept-language';
-import { IntlProvider } from 'react-intl';
+import cookieParser from 'cookie-parser';
+import { addLocaleData, IntlProvider } from 'react-intl';
+import en from 'react-intl/locale-data/en';
+import es from 'react-intl/locale-data/es';
+import fs from 'fs';
+import path from 'path';
+import App from './components/App';
+
+addLocaleData([...es, ...en]);
+
+const messages = {};
+const localeData = {};
+
+['en', 'es'].forEach((locale) => {
+  localeData[locale] = fs.readFileSync(path.join(__dirname, `../node_modules/react-intl/locale-data/${locale}.js`)).toString();
+  messages[locale] = require(`../public/assets/${locale}.json`);
+});
 
 acceptLanguage.languages(['en', 'es']);
 
 const assetUrl = process.env.NODE_ENV !== 'production' ? 'http://localhost:8050' : '/';
 
-function renderHTML(componentHTML) {
+function renderHTML(componentHTML, locale, initialNow) {
   return `
     <!DOCTYPE html>
       <html>
@@ -22,6 +36,8 @@ function renderHTML(componentHTML) {
       <body>
         <div id="react-view">${componentHTML}</div>
         <script type="application/javascript" src="${assetUrl}/public/assets/bundle.js"></script>
+        <script type="application/javascript">${localeData[locale]}</script>
+        <script type="application/javascript">window.INITIAL_NOW=${JSON.stringify(initialNow)}</script>
       </body>
     </html>
   `;
@@ -29,29 +45,26 @@ function renderHTML(componentHTML) {
 
 const app = express();
 app.use(cookieParser());
+app.use('/public/assets', express.static('public/assets'));
 
-/*
-   Detect the language of the user by first looking at cookie
-   (if he is repeat visitor) if first time then detect from
-   header's accept-language parameter else 
-   english
-*/
-function detectLocale(req){
+function detectLocale(req) {
   const cookieLocale = req.cookies.locale;
+
   return acceptLanguage.get(cookieLocale || req.headers['accept-language']) || 'en';
 }
 
 app.use((req, res) => {
   const locale = detectLocale(req);
+  const initialNow = Date.now();
   const componentHTML = ReactDom.renderToString(
-      <IntlProvider local={locale}>
-          <App />
-       </IntlProvider>   
-          );
+    <IntlProvider initialNow={initialNow} locale={locale} messages={messages[locale]}>
+      <App />
+    </IntlProvider>
+  );
 
-  res.cookie('locale', locale, {maxAge: (new Date() * 0.001) + (365 * 24 * 3600) });
-  return res.end(renderHTML(componentHTML));
-})
+  res.cookie('locale', locale, { maxAge: (new Date() * 0.001) + (365 * 24 * 3600) });
+  return res.end(renderHTML(componentHTML, locale, initialNow));
+});
 
 const PORT = process.env.PORT || 3001;
 

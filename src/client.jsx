@@ -1,13 +1,27 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './components/App';
-import { IntlProvider } from 'react-intl';
+import { addLocaleData, IntlProvider } from 'react-intl';
 import Cookie from 'js-cookie';
+import fetch from 'isomorphic-fetch';
 
 const locale = Cookie.get('locale') || 'en';
-
+fetch(`/public/assets/${locale}.json`)
+    .then((res) => {
+        if(res.status >= 400) {
+            throw new Error ('Bad response from server');
+        }
+        return res.json();
+    })
+    .then((localeData) => {
+        addLocaleData(window.ReactIntlLocaleData[locale]);
+   
 ReactDOM.render(
-    <IntlProvider locale={locale}>
+    <IntlProvider locale={locale} messages={localeData}>
         <App />
     </IntlProvider>,    
     document.getElementById('react-view'));
+ })
+.catch((error) => {
+    console.log(error);
+})

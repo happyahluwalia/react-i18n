@@ -1,5 +1,6 @@
 {
   "globalDependencies": {
+    "isomorphic-fetch": "registry:dt/isomorphic-fetch#0.0.0+20170223183302",
     "react-intl": "registry:dt/react-intl#2.2.1+20170323145511"
   }
 }
